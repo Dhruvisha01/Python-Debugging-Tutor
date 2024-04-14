@@ -1,0 +1,218 @@
+/* // <uniquifier>: Use a unique and descriptive class name
+// <weight>: Use a value from 100 to 900 */
+
+.inter-bold {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+}
+.roboto-mono-normal {
+    font-family: "Roboto Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 200;
+    font-style: normal;
+  }
+
+body{
+    background-color: #0F1524 !important;
+    overflow-y: hidden;
+}
+
+.title{
+    padding: 20px;
+}
+.title h1{
+    color: white;
+    font-size: 24px;
+}
+.row{
+    width: 100vw;
+    height: 100vh;
+}
+
+.coding{
+     padding:  5px;
+     height: 100%;
+}
+.chatting{
+    padding:  5px;
+}
+.code{
+    height: 60%;
+    /* display: block; */
+    background-color: #1D2332;
+    padding-top: 10px;
+    position: relative;
+    overflow: hidden;
+    margin-left: 20px;
+    
+}
+.output{
+    height: 40%;
+    /* display: block; */
+    margin-left: 20px;
+}
+
+.chat{
+    height: 100%;
+    /* display: block; */
+    position: relative;
+    overflow-y: auto;
+    background-color: #1D2332;
+
+    
+}
+
+.code-header{
+    padding-left: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+.code-header h6{
+    color: #D2D2D2;
+    font-size: 16px;
+    margin-bottom: 0px;
+}
+
+hr {
+    height: 3px; /* Adjust the height as needed */
+    background-color: white; /* Adjust the color */
+    border: none; /* Remove any default border */
+    margin-bottom: 0px !important;
+    margin-top: 2px !important;
+}
+.btn{
+    background-color: #679FF1 !important;
+    padding: 2px 15px 2px 15px !important;
+    margin-right: 20px;
+
+    font-size: 14px !important;
+    color: white !important;
+
+}
+.output{
+    margin-top: 5px;
+    padding-top: 5px;
+    background-color: #1D2332;
+}
+
+.console-header{
+    padding-top: 10px;
+}
+
+.chat-header{
+    padding-top: 20px;
+}
+
+
+.line-numbers {
+    counter-reset: line;
+    flex-shrink: 0;
+    margin-right: 10px; /* Adjust spacing */
+    margin-left: 10px;
+    padding: 10px 0;
+    /* text-align: right; */
+    color: white;
+    width: 10px;
+  }
+  
+  .line-numbers span {
+    counter-increment: line;
+    display: block;
+  }
+  
+  .code-input {
+    /* display: flex; */
+    height: 100%;
+  }
+
+  .code-input-parent {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    margin-bottom: 20px;
+  }
+
+  textarea.actual-input{
+    flex: 1;
+    resize: none; /* Prevent resizing of textarea */
+  }
+
+  .spacer{
+    height: 10px;
+  }
+
+  
+  textarea {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    resize: none;
+    background-color: transparent;
+    resize: none !important; /* Disable textarea resizing */
+    outline: none; /* Remove outline on focus */
+    box-shadow: none; /* Remove any box shadow */
+    /* width: 100%;  */
+    height: 100%; /* Take full height of the parent */
+    overflow-y: auto; /* Enable vertical scrolling */
+    color: white;
+    font-weight: 200;
+    
+  }
+
+  .input-message {
+    position: absolute;
+    bottom: 100px;
+    left: 25px;
+    width: calc(100% - 50px); /* Adjust for padding */
+    padding: 10px;
+    resize: none;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    /* margin-bottom: 30px; */
+    height: 100px;
+    background-color: white;
+    justify-content: center;
+    color: black;
+    flex: 1;
+
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+
+.send-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    margin-left: -1px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 130px;
+    right: 50px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.send-button i {
+    font-size: 16px;
+}
