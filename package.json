@@ -19,9 +19,12 @@
   },
   "homepage": "https://github.com/Dhruvisha01/Python-Debugging-Tutor#readme",
   "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "i": "^0.3.7",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "openai": "^4.34.0"
   }
 }
