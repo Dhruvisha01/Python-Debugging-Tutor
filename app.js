@@ -1,4 +1,6 @@
 import express from "express";
+import session from "express-session";
+import crypto from 'crypto';
 import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -6,8 +8,6 @@ import bodyParser from "body-parser";
 
 import dotenv from 'dotenv';
 dotenv.config();
-
-
 
 import { OpenAI } from 'openai';
 
@@ -18,41 +18,90 @@ const __dirname = dirname(__filename);
 
 const openai = new OpenAI();
 
-var messagesHistory = [
-    {
-        role: 'system',
-        content: 'You are an experienced programming tutor and I am a student asking you for help with my Python code.\
-            Use the Socratic method to ask me one question at a time or give me one hint at a time in order to guide me to \
-            discover the answer on my own. Do NOT directly give me the answer. Even if I give up and ask you for the answer, \
-            do not give me the answer. Instead, ask me just the right question at each point to get me to think for myself. Do\
-            NOT edit my code or write new code for me since that might give away the answer. Instead, give me hints of where \
-            to look in my existing code for where the problem might be. You can also print out specific parts of my code to point\
-             me in the right direction. Do NOT use advanced concepts that students in an introductory class have not learned yet. \
-             Instead, use concepts that are taught in introductory-level classes and beginner-level programming tutorials. Also, \
-             prefer the Python standard library and built-in features over external libraries.'
-        // content: 'You are an experienced debugging tutor and I am a student asking you for help with debugging my Python code. \
-        // You should not only teach me Python, but you should also teach me important debugging strategies so I can learn to debug \
-        // on my own. For example, you could start by helping me identify the type of error. Then, help me identify where in my code \
-        // the error message might be. When we identify the issue in the code, also explain the error message and Python concepts to \
-        // me. Do not jump to the answer right away.\
-        // Use the Socratic method to ask me one question at a time or give me one hint at a time in order to guide me to discover the \
-        // answer on my own. Do NOT directly give me the answer. Even if I give up and ask you for the answer, do not give me the answer. \
-        // Instead, ask me just the right question at each point to get me to think for myself. \
-        // Instead of asking open-ended questions, try to ask multiple choice questions. Always add a "I don\'t know" option in the answer\
-        //  choices. When you ask the question, you should know what the correct answer is. Then, compare it to the answer I give you. If \
-        //  you ask a follow-up question, you should try to ask it as a multiple choice question if applicable. Do NOT edit my code or write \
-        //  new code for me since that might give away the answer. Instead, give me hints of where to look \
-        // in my existing code for where the problem might be. You can also print out specific parts of my code to point me in the right \
-        // direction. Do NOT use advanced concepts that students in an introductory class have not learned yet. Instead, use concepts that \
-        // are taught in introductory-level classes and beginner-level programming tutorials. Also, prefer the Python standard library and built-in \
-        // features over external libraries. Remember, it is important to ask multiple-choice questions where applicable, rather than open-ended questions.\
-        // When you give the answer choices, format it as "A) ___, B) ____, etc." Remember to add a "I don\'t know" option.'
-    },
+const secretKey = crypto.randomBytes(32).toString('hex');
+// console.log('Generated secret key:', secretKey);
+app.use(session({
+    secret: secretKey, // Use your generated secret key here
+    resave: false,
+    saveUninitialized: true,
+}));
 
-];
 
-var firstRun = true;
 
+// req.session.messagesHistory = [
+//     {
+//         role: 'system',
+//         content: 'You are an experienced programming tutor and I am a student asking you for help with my Python code.\
+//             Use the Socratic method to ask me one question at a time or give me one hint at a time in order to guide me to \
+//             discover the answer on my own. Do NOT directly give me the answer. Even if I give up and ask you for the answer, \
+//             do not give me the answer. Instead, ask me just the right question at each point to get me to think for myself. Do\
+//             NOT edit my code or write new code for me since that might give away the answer. Instead, give me hints of where \
+//             to look in my existing code for where the problem might be. You can also print out specific parts of my code to point\
+//              me in the right direction. Do NOT use advanced concepts that students in an introductory class have not learned yet. \
+//              Instead, use concepts that are taught in introductory-level classes and beginner-level programming tutorials. Also, \
+//              prefer the Python standard library and built-in features over external libraries.'
+//         // content: 'You are an experienced debugging tutor and I am a student asking you for help with debugging my Python code. \
+//         // You should not only teach me Python, but you should also teach me important debugging strategies so I can learn to debug \
+//         // on my own. For example, you could start by helping me identify the type of error. Then, help me identify where in my code \
+//         // the error message might be. When we identify the issue in the code, also explain the error message and Python concepts to \
+//         // me. Do not jump to the answer right away.\
+//         // Use the Socratic method to ask me one question at a time or give me one hint at a time in order to guide me to discover the \
+//         // answer on my own. Do NOT directly give me the answer. Even if I give up and ask you for the answer, do not give me the answer. \
+//         // Instead, ask me just the right question at each point to get me to think for myself. \
+//         // Instead of asking open-ended questions, try to ask multiple choice questions. Always add a "I don\'t know" option in the answer\
+//         //  choices. When you ask the question, you should know what the correct answer is. Then, compare it to the answer I give you. If \
+//         //  you ask a follow-up question, you should try to ask it as a multiple choice question if applicable. Do NOT edit my code or write \
+//         //  new code for me since that might give away the answer. Instead, give me hints of where to look \
+//         // in my existing code for where the problem might be. You can also print out specific parts of my code to point me in the right \
+//         // direction. Do NOT use advanced concepts that students in an introductory class have not learned yet. Instead, use concepts that \
+//         // are taught in introductory-level classes and beginner-level programming tutorials. Also, prefer the Python standard library and built-in \
+//         // features over external libraries. Remember, it is important to ask multiple-choice questions where applicable, rather than open-ended questions.\
+//         // When you give the answer choices, format it as "A) ___, B) ____, etc." Remember to add a "I don\'t know" option.'
+//     },
+
+// ];
+
+// req.session.firstRun = true;
+
+app.use((req, res, next) => {
+    if (!req.session.messagesHistory) {
+        req.session.messagesHistory = [
+            {
+                role: 'system',
+                content: 'You are an experienced programming tutor and I am a student asking you for help with my Python code.\
+                    Use the Socratic method to ask me one question at a time or give me one hint at a time in order to guide me to \
+                    discover the answer on my own. Do NOT directly give me the answer. Even if I give up and ask you for the answer, \
+                    do not give me the answer. Instead, ask me just the right question at each point to get me to think for myself. Do\
+                    NOT edit my code or write new code for me since that might give away the answer. Instead, give me hints of where \
+                    to look in my existing code for where the problem might be. You can also print out specific parts of my code to point\
+                     me in the right direction. Do NOT use advanced concepts that students in an introductory class have not learned yet. \
+                     Instead, use concepts that are taught in introductory-level classes and beginner-level programming tutorials. Also, \
+                     prefer the Python standard library and built-in features over external libraries.'
+                // content: 'You are an experienced debugging tutor and I am a student asking you for help with debugging my Python code. \
+                // You should not only teach me Python, but you should also teach me important debugging strategies so I can learn to debug \
+                // on my own. For example, you could start by helping me identify the type of error. Then, help me identify where in my code \
+                // the error message might be. When we identify the issue in the code, also explain the error message and Python concepts to \
+                // me. Do not jump to the answer right away.\
+                // Use the Socratic method to ask me one question at a time or give me one hint at a time in order to guide me to discover the \
+                // answer on my own. Do NOT directly give me the answer. Even if I give up and ask you for the answer, do not give me the answer. \
+                // Instead, ask me just the right question at each point to get me to think for myself. \
+                // Instead of asking open-ended questions, try to ask multiple choice questions. Always add a "I don\'t know" option in the answer\
+                //  choices. When you ask the question, you should know what the correct answer is. Then, compare it to the answer I give you. If \
+                //  you ask a follow-up question, you should try to ask it as a multiple choice question if applicable. Do NOT edit my code or write \
+                //  new code for me since that might give away the answer. Instead, give me hints of where to look \
+                // in my existing code for where the problem might be. You can also print out specific parts of my code to point me in the right \
+                // direction. Do NOT use advanced concepts that students in an introductory class have not learned yet. Instead, use concepts that \
+                // are taught in introductory-level classes and beginner-level programming tutorials. Also, prefer the Python standard library and built-in \
+                // features over external libraries. Remember, it is important to ask multiple-choice questions where applicable, rather than open-ended questions.\
+                // When you give the answer choices, format it as "A) ___, B) ____, etc." Remember to add a "I don\'t know" option.'
+            },
+        ];
+    }
+    if (typeof req.session.firstRun === 'undefined') {
+        req.session.firstRun = true;
+    }
+    next();
+});
 function parseCode(code) {
     const lines = code.split(/\r?\n/); // Splits by either \n or \r\n
     // console.log(lines);
@@ -156,9 +205,9 @@ app.post("/codeRun", async (req, res) => {
     userCode["role"] = "user";
     userCode["content"] = `This is my code - ${codeLines}. The output I am getting is - ${output}`;
     console.log("First Temp dict - ", userCode)
-    messagesHistory.push(userCode);
+    req.session.messagesHistory.push(userCode);
     console.log("Messages history after first temp dict")
-    console.log(messagesHistory)
+    console.log(req.session.messagesHistory)
 
     if (error == "yes") {
         var debuggerMessage = "It looks like we got an error. When I start debugging, I like to remind myself of the purpose of my code. Sometimes, that helps me figure out the issue faster. Could you describe what your code is supposed to do?";
@@ -167,23 +216,23 @@ app.post("/codeRun", async (req, res) => {
     else {
         var debuggerMessage = "The output doesn't show that your code has an error. Is your code behaving in the way you expect it to?";
     }
-    if (firstRun) {
+    if (req.session.firstRun) {
         temp_dict["role"] = "assistant";
         temp_dict["content"] = debuggerMessage;
         console.log("Second Temp dict - ", temp_dict)
-        messagesHistory.push(temp_dict);
+        req.session.messagesHistory.push(temp_dict);
         console.log("Messages history after second temp dict")
-        console.log(messagesHistory)
+        console.log(req.session.messagesHistory)
     }
     else {
-        var tutor = await codeDebugger(messagesHistory);
+        var tutor = await codeDebugger(req.session.messagesHistory);
         console.log(tutor)
         var debuggerMessage = tutor
         // res.status(200).send(tutor);
 
     }
 
-    firstRun = false;
+    req.session.firstRun = false;
 
     // res.render('index', { content: output, code: code, error: error, tutor: debuggerMessage }, (err, html) => {
     //     if (err) {
@@ -210,17 +259,55 @@ app.post('/chatgpt', async (req, res) => {
     var temp_dict = {}
     temp_dict["role"] = "user";
     temp_dict["content"] = messageContent;
-    messagesHistory.push(temp_dict);
-    console.log(messagesHistory);
-    var tutor = await codeDebugger(messagesHistory);
+    req.session.messagesHistory.push(temp_dict);
+    console.log(req.session.messagesHistory);
+    var tutor = await codeDebugger(req.session.messagesHistory);
     console.log(tutor)
     var chatgptResponse = {}
     chatgptResponse["role"] = "assistant";
     chatgptResponse["content"] = tutor;
-    messagesHistory.push(chatgptResponse);
-    console.log(messagesHistory);
+    req.session.messagesHistory.push(chatgptResponse);
+    console.log(req.session.messagesHistory);
     // res.status(200).send('Message sent successfully');
     res.status(200).send(tutor);
+});
+app.get('/reset-session', (req, res) => {
+    // Reset session-specific data or variables
+    req.session.messagesHistory = [
+        {
+            role: 'system',
+            content: 'You are an experienced programming tutor and I am a student asking you for help with my Python code.\
+                Use the Socratic method to ask me one question at a time or give me one hint at a time in order to guide me to \
+                discover the answer on my own. Do NOT directly give me the answer. Even if I give up and ask you for the answer, \
+                do not give me the answer. Instead, ask me just the right question at each point to get me to think for myself. Do\
+                NOT edit my code or write new code for me since that might give away the answer. Instead, give me hints of where \
+                to look in my existing code for where the problem might be. You can also print out specific parts of my code to point\
+                 me in the right direction. Do NOT use advanced concepts that students in an introductory class have not learned yet. \
+                 Instead, use concepts that are taught in introductory-level classes and beginner-level programming tutorials. Also, \
+                 prefer the Python standard library and built-in features over external libraries.'
+            // content: 'You are an experienced debugging tutor and I am a student asking you for help with debugging my Python code. \
+            // You should not only teach me Python, but you should also teach me important debugging strategies so I can learn to debug \
+            // on my own. For example, you could start by helping me identify the type of error. Then, help me identify where in my code \
+            // the error message might be. When we identify the issue in the code, also explain the error message and Python concepts to \
+            // me. Do not jump to the answer right away.\
+            // Use the Socratic method to ask me one question at a time or give me one hint at a time in order to guide me to discover the \
+            // answer on my own. Do NOT directly give me the answer. Even if I give up and ask you for the answer, do not give me the answer. \
+            // Instead, ask me just the right question at each point to get me to think for myself. \
+            // Instead of asking open-ended questions, try to ask multiple choice questions. Always add a "I don\'t know" option in the answer\
+            //  choices. When you ask the question, you should know what the correct answer is. Then, compare it to the answer I give you. If \
+            //  you ask a follow-up question, you should try to ask it as a multiple choice question if applicable. Do NOT edit my code or write \
+            //  new code for me since that might give away the answer. Instead, give me hints of where to look \
+            // in my existing code for where the problem might be. You can also print out specific parts of my code to point me in the right \
+            // direction. Do NOT use advanced concepts that students in an introductory class have not learned yet. Instead, use concepts that \
+            // are taught in introductory-level classes and beginner-level programming tutorials. Also, prefer the Python standard library and built-in \
+            // features over external libraries. Remember, it is important to ask multiple-choice questions where applicable, rather than open-ended questions.\
+            // When you give the answer choices, format it as "A) ___, B) ____, etc." Remember to add a "I don\'t know" option.'
+        },
+    ];
+    req.session.firstRun = true;
+    console.log("Reset session confirming - ")
+    console.log(req.session.messagesHistory)
+    res.send('Session reset successful');
 });
 
 app.listen(port, () => {

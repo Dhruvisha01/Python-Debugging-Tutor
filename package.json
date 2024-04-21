@@ -20,9 +20,14 @@
   "homepage": "https://github.com/Dhruvisha01/Python-Debugging-Tutor#readme",
   "dependencies": {
     "body-parser": "^1.20.2",
+    "browser-sync": "^3.0.2",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "gulp": "^5.0.0",
+    "gulp-nodemon": "^2.5.0",
     "i": "^0.3.7",
     "nodemon": "^3.1.0",
     "openai": "^4.34.0"

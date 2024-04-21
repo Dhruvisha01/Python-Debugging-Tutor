@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         xhr.send(JSON.stringify({ code: codeContent }));
     });
-    
+
 
 
 
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
                     document.querySelector('.messages').appendChild(newMessageDiv);
-                    
+
 
                     // Clear textarea after sending message
                     textarea.value = '';
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
                     // document.querySelector('.messages').appendChild(tutorMessageDiv);
-                    setTimeout(function() {
+                    setTimeout(function () {
                         // Append the debug tutor message after the delay
                         document.querySelector('.messages').appendChild(tutorMessageDiv);
                         scrollToBottom(); // Scroll to the bottom after both messages are added
@@ -122,3 +122,21 @@ function scrollToBottom() {
     var chatbox = document.getElementById('messages');
     chatbox.scrollTop = chatbox.scrollHeight;
 }
+
+window.addEventListener('beforeunload', function (event) {
+    // Send an asynchronous request to the server to reset the session
+    fetch('/reset-session', {
+        method: 'GET',
+        credentials: 'same-origin' // Include credentials if needed (e.g., for cookies)
+    })
+        .then(response => {
+            if (response.ok) {
+                console.log('Session reset successfully');
+            } else {
+                console.error('Failed to reset session');
+            }
+        })
+        .catch(error => {
+            console.error('Error occurred:', error);
+        });
+});
